@@ -1,0 +1,5 @@
+{
+  "name": "VibeVault React",
+  "description": "A Steam-themed HTML game library with local storage, export, and import capabilities.",
+  "requestFramePermissions": []
+}

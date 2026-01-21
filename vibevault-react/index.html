@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="https://lucide.dev/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VibeVault // Game Portfolio</title>
+    <!-- Tailwind CSS (CDN kept for simplicity, though npm is recommended for prod) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- JSZip for Exporting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+      :root {
+        --steam-bg: #1b2838;
+        --steam-darker: #171a21;
+        --steam-blue: #2a475e;
+        --steam-light: #66c0f4;
+        --steam-accent: #c7d5e0;
+      }
+      body {
+        background: linear-gradient(180deg, var(--steam-bg) 0%, var(--steam-darker) 100%);
+        color: var(--steam-accent);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #171a21; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #2a475e; 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #66c0f4; 
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <!-- Point to the TypeScript entry file -->
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
