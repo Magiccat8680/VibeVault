@@ -131,6 +131,33 @@ const App: React.FC = () => {
     }
   };
 
+  const handleGameDragStart = (gameId: string) => (e: React.DragEvent) => {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('gameId', gameId);
+  };
+
+  const handleFolderDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleFolderDrop = (folderId: string | null) => async (e: React.DragEvent) => {
+    e.preventDefault();
+    const gameId = e.dataTransfer.getData('gameId');
+    if (!gameId) return;
+
+    try {
+      const gameToUpdate = games.find(g => g.id === gameId);
+      if (gameToUpdate) {
+        const updatedGame = { ...gameToUpdate, folderId: folderId || undefined };
+        await saveGameToDB(updatedGame);
+        setGames(prev => prev.map(g => g.id === gameId ? updatedGame : g));
+      }
+    } catch (e) {
+      console.error("Failed to move game", e);
+    }
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     
@@ -356,6 +383,8 @@ const App: React.FC = () => {
                 <div className="flex flex-wrap gap-2 mb-6">
                   <button
                     onClick={() => setSelectedFolder(null)}
+                    onDragOver={handleFolderDragOver}
+                    onDrop={handleFolderDrop(null)}
                     className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
                       selectedFolder === null
                         ? 'bg-[#66c0f4] text-white'
@@ -368,6 +397,8 @@ const App: React.FC = () => {
                     <div key={folder.id} className="flex items-center gap-1">
                       <button
                         onClick={() => setSelectedFolder(folder.id)}
+                        onDragOver={handleFolderDragOver}
+                        onDrop={handleFolderDrop(folder.id)}
                         className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
                           selectedFolder === folder.id
                             ? 'bg-[#66c0f4] text-white'
@@ -391,7 +422,7 @@ const App: React.FC = () => {
 
             {/* Games Display */}
             {games.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {games
                   .filter(g => selectedFolder === null ? !g.folderId : g.folderId === selectedFolder)
                   .sort((a, b) => b.addedAt - a.addedAt)
@@ -401,6 +432,7 @@ const App: React.FC = () => {
                       game={game} 
                       onLaunch={handleLaunch} 
                       onDelete={deleteGame}
+                      onDragStart={handleGameDragStart(game.id)}
                     />
                 ))}
               </div>

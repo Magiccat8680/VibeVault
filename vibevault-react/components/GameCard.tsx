@@ -7,9 +7,10 @@ interface GameCardProps {
   game: Game;
   onLaunch: (game: Game) => void;
   onDelete: (id: string) => void;
+  onDragStart?: (e: React.DragEvent) => void;
 }
 
-const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete }) => {
+const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragStart }) => {
   
   const theme = useMemo(() => {
     let hash = 0;
@@ -30,7 +31,11 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete }) => {
   };
 
   return (
-    <div className="group relative flex flex-col rounded-sm overflow-hidden bg-[#1b2838] border border-white/5 hover:border-[#66c0f4] hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.5)] transition-all duration-300 h-64">
+    <div 
+      draggable
+      onDragStart={onDragStart}
+      className="group relative flex flex-col rounded-sm overflow-hidden bg-[#1b2838] border border-white/5 hover:border-[#66c0f4] hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.5)] transition-all duration-300 h-64 cursor-grab active:cursor-grabbing"
+    >
       
       {/* --- DELETE BUTTON (Absolute Overlay - Highest Z-Index) --- */}
       <button 
@@ -44,7 +49,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete }) => {
 
       {/* --- THUMBNAIL SECTION (Clickable) --- */}
       <div 
-        className="relative w-full h-40 bg-black overflow-hidden cursor-pointer group/thumbnail"
+        className="relative w-full h-64 bg-black overflow-hidden cursor-pointer group/thumbnail"
         onClick={() => onLaunch(game)}
       >
         {/* Background Visuals */}
