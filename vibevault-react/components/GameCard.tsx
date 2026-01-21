@@ -50,13 +50,13 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete }) => {
         {/* Background Visuals */}
         <div className="absolute inset-0 pointer-events-none select-none">
              <div className="absolute inset-0" style={theme} />
-             <div className="w-full h-full bg-white opacity-90">
+             <div className="w-full h-full bg-white opacity-90 flex items-center justify-center overflow-hidden">
                 <iframe 
                     srcDoc={game.content}
                     className="w-full h-full border-none pointer-events-none" 
                     tabIndex={-1}
                     title="preview"
-                    style={{ pointerEvents: 'none' }}
+                    style={{ pointerEvents: 'none', transform: 'scale(1.5)' }}
                 />
             </div>
         </div>
