@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Game } from './types';
 import Header from './components/Header';
 import GameCard from './components/GameCard';

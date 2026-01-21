@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd vibevault-react && npm ci && npm run build",
+  "outputDirectory": "vibevault-react/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

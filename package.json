@@ -1,0 +1,13 @@
+{
+  "name": "vibevault",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "cd vibevault-react && npm run dev",
+    "build": "cd vibevault-react && npm run build",
+    "preview": "cd vibevault-react && npm run preview"
+  },
+  "workspaces": [
+    "vibevault-react"
+  ]
+}
