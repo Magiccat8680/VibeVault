@@ -1,9 +1,10 @@
-import { Game } from '../types';
+import { Game, GameFolder } from '../types';
 
 // --- IndexedDB Configuration ---
 const DB_NAME = 'VibeVaultDB';
 const STORE_NAME = 'games';
-const DB_VERSION = 1;
+const FOLDERS_STORE_NAME = 'folders';
+const DB_VERSION = 2;
 
 /**
  * Initialize the database
@@ -17,6 +18,9 @@ export const initDB = (): Promise<IDBDatabase> => {
       const db = (event.target as IDBOpenDBRequest).result;
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains(FOLDERS_STORE_NAME)) {
+        db.createObjectStore(FOLDERS_STORE_NAME, { keyPath: 'id' });
       }
     };
   });
@@ -278,4 +282,48 @@ export const exportToZip = async (games: Game[]) => {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+};
+
+// --- Folder Operations ---
+
+/**
+ * Save a folder
+ */
+export const saveFolderToDB = async (folder: GameFolder): Promise<void> => {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(FOLDERS_STORE_NAME, 'readwrite');
+    const store = tx.objectStore(FOLDERS_STORE_NAME);
+    const request = store.put(folder);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+};
+
+/**
+ * Load all folders
+ */
+export const loadFoldersFromDB = async (): Promise<GameFolder[]> => {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(FOLDERS_STORE_NAME, 'readonly');
+    const store = tx.objectStore(FOLDERS_STORE_NAME);
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+  });
+};
+
+/**
+ * Delete a folder
+ */
+export const deleteFolderFromDB = async (id: string): Promise<void> => {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(FOLDERS_STORE_NAME, 'readwrite');
+    const store = tx.objectStore(FOLDERS_STORE_NAME);
+    const request = store.delete(id);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
 };

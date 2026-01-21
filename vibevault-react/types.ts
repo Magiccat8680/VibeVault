@@ -4,6 +4,13 @@ export interface Game {
   content: string; // The raw HTML content
   addedAt: number;
   lastPlayed?: number;
+  folderId?: string; // Reference to parent folder
+}
+
+export interface GameFolder {
+  id: string;
+  name: string;
+  createdAt: number;
 }
 
 export interface StorageStats {

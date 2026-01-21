@@ -44,7 +44,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete }) => {
 
       {/* --- THUMBNAIL SECTION (Clickable) --- */}
       <div 
-        className="relative w-full h-40 bg-black overflow-hidden cursor-pointer"
+        className="relative w-full h-40 bg-black overflow-hidden cursor-pointer group/thumbnail"
         onClick={() => onLaunch(game)}
       >
         {/* Background Visuals */}
@@ -53,10 +53,10 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete }) => {
              <div className="w-full h-full bg-white opacity-90 flex items-center justify-center overflow-hidden">
                 <iframe 
                     srcDoc={game.content}
-                    className="w-full h-full border-none pointer-events-none" 
+                    className="w-full h-full border-none pointer-events-none object-cover" 
                     tabIndex={-1}
                     title="preview"
-                    style={{ pointerEvents: 'none', transform: 'scale(1.5)' }}
+                    style={{ pointerEvents: 'none', transformOrigin: 'center' }}
                 />
             </div>
         </div>

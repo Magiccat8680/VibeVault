@@ -3,6 +3,7 @@ import { X, Maximize2, Minimize2, RotateCcw } from 'lucide-react';
 import { Game } from '../types';
 import { prepareGameContent } from '../services/gameService';
 import { formatGameName } from '../utils';
+import './PlayOverlay.css';
 
 interface PlayOverlayProps {
   game: Game;
@@ -13,6 +14,7 @@ interface PlayOverlayProps {
 const PlayOverlay: React.FC<PlayOverlayProps> = ({ game, onClose, onUpdateGame }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [srcUrl, setSrcUrl] = useState<string>('');
+  const [isAnimating, setIsAnimating] = useState(true);
   
   // Initialize Game
   useEffect(() => {
@@ -24,7 +26,13 @@ const PlayOverlay: React.FC<PlayOverlayProps> = ({ game, onClose, onUpdateGame }
     // Update last played
     onUpdateGame(game.id, { lastPlayed: Date.now() });
 
-    return () => URL.revokeObjectURL(url);
+    // End animation after 500ms
+    const timer = setTimeout(() => setIsAnimating(false), 500);
+
+    return () => {
+      URL.revokeObjectURL(url);
+      clearTimeout(timer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); 
 
@@ -37,7 +45,7 @@ const PlayOverlay: React.FC<PlayOverlayProps> = ({ game, onClose, onUpdateGame }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-black animate-in fade-in duration-200 font-sans">
+    <div className={`fixed inset-0 z-50 flex flex-col bg-black font-sans ${isAnimating ? 'zoom-in-animation' : ''}`}>
         {/* Toolbar */}
         <div className="flex items-center justify-between px-4 py-2 bg-[#171a21] border-b border-gray-800 text-gray-300 select-none h-14 shrink-0">
             <h2 className="font-bold truncate max-w-md flex items-center gap-2 text-sm md:text-base">

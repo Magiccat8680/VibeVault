@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Game } from './types';
+import { Game, GameFolder } from './types';
 import Header from './components/Header';
 import GameCard from './components/GameCard';
 import ExportModal from './components/ExportModal';
@@ -13,16 +13,23 @@ import {
   loadGamesFromDB,
   saveGameToDB,
   deleteGameFromDB,
-  clearDB
+  clearDB,
+  loadFoldersFromDB,
+  saveFolderToDB,
+  deleteFolderFromDB
 } from './services/gameService';
-import { HardDrive, Loader2, Ghost } from 'lucide-react';
+import { HardDrive, Loader2, Ghost, Plus, Folder, Trash2 } from 'lucide-react';
 
 const App: React.FC = () => {
   const [games, setGames] = useState<Game[]>([]);
+  const [folders, setFolders] = useState<GameFolder[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [playingGame, setPlayingGame] = useState<Game | null>(null);
+  const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
   
   // Hidden inputs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -33,7 +40,9 @@ const App: React.FC = () => {
     const init = async () => {
       try {
         const storedGames = await loadGamesFromDB();
+        const storedFolders = await loadFoldersFromDB();
         setGames(storedGames);
+        setFolders(storedFolders);
       } catch (e) {
         console.error("Failed to load games from DB", e);
       } finally {
@@ -80,6 +89,46 @@ const App: React.FC = () => {
         }
     } catch (e) {}
     return `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  };
+
+  const createFolder = async (name: string) => {
+    if (!name.trim()) return;
+    const newFolder: GameFolder = {
+      id: generateId(),
+      name: name.trim(),
+      createdAt: Date.now()
+    };
+    try {
+      await saveFolderToDB(newFolder);
+      setFolders(prev => [...prev, newFolder]);
+      setNewFolderName('');
+      setShowNewFolderInput(false);
+    } catch (e) {
+      console.error("Failed to create folder", e);
+    }
+  };
+
+  const deleteFolder = async (folderId: string) => {
+    if (window.confirm("Delete this folder? Games inside will be moved to the library root.")) {
+      try {
+        // Move games from this folder to root
+        const gamesInFolder = games.filter(g => g.folderId === folderId);
+        for (const game of gamesInFolder) {
+          const updatedGame = { ...game, folderId: undefined };
+          await saveGameToDB(updatedGame);
+        }
+        setGames(prev => prev.map(g => g.folderId === folderId ? { ...g, folderId: undefined } : g));
+        
+        // Delete folder
+        await deleteFolderFromDB(folderId);
+        setFolders(prev => prev.filter(f => f.id !== folderId));
+        if (selectedFolder === folderId) {
+          setSelectedFolder(null);
+        }
+      } catch (e) {
+        console.error("Failed to delete folder", e);
+      }
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -249,27 +298,122 @@ const App: React.FC = () => {
            <div className="flex justify-center mt-20">
               <Loader2 className="animate-spin text-[#66c0f4]" size={40} />
            </div>
-        ) : games.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {games
-              .sort((a, b) => b.addedAt - a.addedAt)
-              .map(game => (
-                <GameCard 
-                  key={game.id} 
-                  game={game} 
-                  onLaunch={handleLaunch} 
-                  onDelete={deleteGame}
-                />
-            ))}
-          </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-96 text-gray-600">
-            <Ghost size={64} className="mb-4 opacity-50" />
-            <h2 className="text-xl font-bold mb-2">Library Empty</h2>
-            <p className="max-w-xs text-center">
-              Your vault is empty. Click <span className="text-[#66c0f4] font-bold">ADD GAME</span> to upload HTML files or React components (.jsx/.tsx).
-            </p>
-          </div>
+          <>
+            {/* Folder Management */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Folder size={18} /> Organization
+                </h3>
+                {!showNewFolderInput && (
+                  <button
+                    onClick={() => setShowNewFolderInput(true)}
+                    className="flex items-center gap-2 bg-[#2a475e] hover:bg-[#3d5a77] text-white px-3 py-1 rounded text-sm font-medium transition-colors"
+                  >
+                    <Plus size={14} /> New Folder
+                  </button>
+                )}
+              </div>
+
+              {showNewFolderInput && (
+                <div className="flex gap-2 mb-4 p-3 bg-[#2a475e] rounded">
+                  <input
+                    type="text"
+                    placeholder="Folder name..."
+                    value={newFolderName}
+                    onChange={(e) => setNewFolderName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        createFolder(newFolderName);
+                      } else if (e.key === 'Escape') {
+                        setShowNewFolderInput(false);
+                        setNewFolderName('');
+                      }
+                    }}
+                    className="flex-1 bg-[#1b2838] border border-gray-700 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-[#66c0f4]"
+                    autoFocus
+                  />
+                  <button
+                    onClick={() => createFolder(newFolderName)}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+                  >
+                    Create
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowNewFolderInput(false);
+                      setNewFolderName('');
+                    }}
+                    className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+
+              {folders.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-6">
+                  <button
+                    onClick={() => setSelectedFolder(null)}
+                    className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
+                      selectedFolder === null
+                        ? 'bg-[#66c0f4] text-white'
+                        : 'bg-[#2a475e] text-gray-300 hover:bg-[#3d5a77]'
+                    }`}
+                  >
+                    All Games ({games.length})
+                  </button>
+                  {folders.map(folder => (
+                    <div key={folder.id} className="flex items-center gap-1">
+                      <button
+                        onClick={() => setSelectedFolder(folder.id)}
+                        className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
+                          selectedFolder === folder.id
+                            ? 'bg-[#66c0f4] text-white'
+                            : 'bg-[#2a475e] text-gray-300 hover:bg-[#3d5a77]'
+                        }`}
+                      >
+                        {folder.name} ({games.filter(g => g.folderId === folder.id).length})
+                      </button>
+                      <button
+                        onClick={() => deleteFolder(folder.id)}
+                        className="p-1 text-gray-500 hover:text-red-500 transition-colors"
+                        title="Delete folder"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Games Display */}
+            {games.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {games
+                  .filter(g => selectedFolder === null ? !g.folderId : g.folderId === selectedFolder)
+                  .sort((a, b) => b.addedAt - a.addedAt)
+                  .map(game => (
+                    <GameCard 
+                      key={game.id} 
+                      game={game} 
+                      onLaunch={handleLaunch} 
+                      onDelete={deleteGame}
+                    />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-96 text-gray-600">
+                <Ghost size={64} className="mb-4 opacity-50" />
+                <h2 className="text-xl font-bold mb-2">Library Empty</h2>
+                <p className="max-w-xs text-center">
+                  Your vault is empty. Click <span className="text-[#66c0f4] font-bold">ADD GAME</span> to upload HTML files or React components (.jsx/.tsx).
+                </p>
+              </div>
+            )}
+          </>
         )}
       </main>
 
