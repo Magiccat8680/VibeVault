@@ -34,7 +34,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
     <div 
       draggable
       onDragStart={onDragStart}
-      className="group relative flex flex-col rounded-sm overflow-hidden bg-[#1b2838] border border-white/5 hover:border-[#66c0f4] hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.5)] transition-all duration-300 h-64 cursor-grab active:cursor-grabbing"
+      className="group relative flex flex-col rounded-sm overflow-hidden bg-[#1b2838] border border-white/5 hover:border-[#66c0f4] hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.5)] transition-all duration-300 h-16 cursor-grab active:cursor-grabbing"
     >
       
       {/* --- DELETE BUTTON (Absolute Overlay - Highest Z-Index) --- */}
@@ -49,7 +49,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
 
       {/* --- THUMBNAIL SECTION (Clickable) --- */}
       <div 
-        className="relative w-full h-64 bg-black overflow-hidden cursor-pointer group/thumbnail"
+        className="relative w-full h-16 bg-black overflow-hidden cursor-pointer group/thumbnail"
         onClick={() => onLaunch(game)}
       >
         {/* Background Visuals */}
@@ -58,10 +58,16 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
              <div className="w-full h-full bg-white opacity-90 flex items-center justify-center overflow-hidden">
                 <iframe 
                     srcDoc={game.content}
-                    className="w-full h-full border-none pointer-events-none object-cover" 
+                    className="border-none pointer-events-none" 
                     tabIndex={-1}
                     title="preview"
-                    style={{ pointerEvents: 'none', transformOrigin: 'center' }}
+                    style={{ 
+                      pointerEvents: 'none', 
+                      transformOrigin: 'top left',
+                      transform: 'scale(0.08)',
+                      width: '640px',
+                      height: '480px'
+                    }}
                 />
             </div>
         </div>
