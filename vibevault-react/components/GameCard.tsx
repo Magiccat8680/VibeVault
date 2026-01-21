@@ -50,7 +50,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete }) => {
         {/* Background Visuals */}
         <div className="absolute inset-0 pointer-events-none select-none">
              <div className="absolute inset-0" style={theme} />
-             <div className="w-[400%] h-[400%] origin-top-left transform scale-25 bg-white opacity-90">
+             <div className="w-full h-full bg-white opacity-90">
                 <iframe 
                     srcDoc={game.content}
                     className="w-full h-full border-none pointer-events-none" 
