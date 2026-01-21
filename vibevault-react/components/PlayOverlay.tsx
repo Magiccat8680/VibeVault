@@ -84,7 +84,7 @@ const PlayOverlay: React.FC<PlayOverlayProps> = ({ game, onClose, onUpdateGame }
                  <iframe 
                     src={srcUrl}
                     className="w-full h-full border-none block"
-                    sandbox="allow-scripts allow-modals allow-popups allow-pointer-lock allow-forms"
+                    sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-pointer-lock allow-forms"
                     allowFullScreen
                  />
              ) : (
