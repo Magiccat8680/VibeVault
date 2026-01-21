@@ -41,8 +41,8 @@ const PlayOverlay: React.FC<PlayOverlayProps> = ({ game, onClose, onUpdateGame }
         {/* Toolbar */}
         <div className="flex items-center justify-between px-4 py-2 bg-[#171a21] border-b border-gray-800 text-gray-300 select-none h-14 shrink-0">
             <h2 className="font-bold truncate max-w-md flex items-center gap-2 text-sm md:text-base">
-                <formatGameName(game.name)sName="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                {game.name}
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                {formatGameName(game.name)}
             </h2>
             
             <div className="flex items-center gap-2">

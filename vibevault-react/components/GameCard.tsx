@@ -74,8 +74,8 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete }) => {
         className="flex-1 bg-[#171a21] border-t border-white/5 flex flex-col justify-center px-4 py-2 cursor-pointer relative z-10"
         onClick={() => onLaunch(game)}
       >
-        <h3formatGameName(game.name)e="font-bold text-gray-200 truncate text-sm group-hover:text-[#66c0f4] transition-colors">
-          {game.name}
+        <h3 className="font-bold text-gray-200 truncate text-sm group-hover:text-[#66c0f4] transition-colors">
+          {formatGameName(game.name)}
         </h3>
         <div className="flex items-center gap-1 mt-1 text-xs text-gray-500 font-medium">
           <Calendar size={10} />
