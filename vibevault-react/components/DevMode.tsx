@@ -5,7 +5,8 @@ interface DevModeProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  onUploadGame: (uploaderName: string, gameFile: File) => void;
+  // Updated to include gameName
+  onUploadGame: (uploaderName: string, gameName: string, gameFile: File) => void;
 }
 
 const DevMode: React.FC<DevModeProps> = ({ isOpen, onClose, onSuccess, onUploadGame }) => {
@@ -13,6 +14,8 @@ const DevMode: React.FC<DevModeProps> = ({ isOpen, onClose, onSuccess, onUploadG
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploaderName, setUploaderName] = useState('');
+  // New state for Game Name
+  const [gameName, setGameName] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -38,17 +41,23 @@ const DevMode: React.FC<DevModeProps> = ({ isOpen, onClose, onSuccess, onUploadG
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedFile || !uploaderName.trim()) {
-      setMessage('Please select a file and enter your name');
+    // Validate gameName is present
+    if (!selectedFile || !uploaderName.trim() || !gameName.trim()) {
+      setMessage('Please fill in all fields');
       return;
     }
 
     setLoading(true);
     try {
-      onUploadGame(uploaderName.trim(), selectedFile);
+      // Pass gameName to the handler
+      onUploadGame(uploaderName.trim(), gameName.trim(), selectedFile);
       setMessage('Game uploaded successfully! 🎮');
+      
+      // Reset form
       setSelectedFile(null);
       setUploaderName('');
+      setGameName('');
+      
       setTimeout(() => {
         onSuccess();
       }, 1000);
@@ -63,7 +72,7 @@ const DevMode: React.FC<DevModeProps> = ({ isOpen, onClose, onSuccess, onUploadG
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#171a21] border border-gray-700 rounded-lg shadow-xl max-w-md w-full max-h-96 overflow-y-auto">
+      <div className="bg-[#171a21] border border-gray-700 rounded-lg shadow-xl max-w-md w-full max-h-[500px] overflow-y-auto">
         
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-700 sticky top-0 bg-[#171a21]">
@@ -114,6 +123,7 @@ const DevMode: React.FC<DevModeProps> = ({ isOpen, onClose, onSuccess, onUploadG
                 <span className="text-sm text-green-300 font-semibold">Authenticated</span>
               </div>
 
+              {/* Uploader Name Input */}
               <div>
                 <label className="block text-sm font-semibold text-gray-300 mb-2">
                   Your Name
@@ -127,6 +137,21 @@ const DevMode: React.FC<DevModeProps> = ({ isOpen, onClose, onSuccess, onUploadG
                 />
               </div>
 
+              {/* New Game Name Input */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                  Game Name
+                </label>
+                <input
+                  type="text"
+                  value={gameName}
+                  onChange={(e) => setGameName(e.target.value)}
+                  placeholder="Enter the title of the game"
+                  className="w-full bg-gray-900 border border-gray-700 text-white px-3 py-2 rounded text-sm focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              {/* File Input */}
               <div>
                 <label className="block text-sm font-semibold text-gray-300 mb-2">
                   Game File (HTML, React, or ZIP)
@@ -163,7 +188,7 @@ const DevMode: React.FC<DevModeProps> = ({ isOpen, onClose, onSuccess, onUploadG
                 </button>
                 <button
                   type="submit"
-                  disabled={loading || !selectedFile || !uploaderName.trim()}
+                  disabled={loading || !selectedFile || !uploaderName.trim() || !gameName.trim()}
                   className="flex-1 bg-gradient-to-r from-[#47bfff] to-[#1a44c2] hover:brightness-110 disabled:brightness-75 text-white font-bold py-2 px-4 rounded transition-all flex items-center justify-center gap-2"
                 >
                   <Upload size={16} />
