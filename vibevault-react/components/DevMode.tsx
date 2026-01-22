@@ -8,8 +8,6 @@ interface DevModeProps {
   onUploadGame: (uploaderName: string, gameFile: File) => void;
 }
 
-const DEV_CODE = 'vibevault-dev-2024';
-
 const DevMode: React.FC<DevModeProps> = ({ isOpen, onClose, onSuccess, onUploadGame }) => {
   const [code, setCode] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -20,7 +18,8 @@ const DevMode: React.FC<DevModeProps> = ({ isOpen, onClose, onSuccess, onUploadG
 
   const handleSubmitCode = (e: React.FormEvent) => {
     e.preventDefault();
-    if (code === DEV_CODE) {
+    const devCode = import.meta.env.VITE_DEV_CODE || '';
+    if (code === devCode) {
       setIsAuthenticated(true);
       setMessage('');
     } else {
@@ -130,12 +129,12 @@ const DevMode: React.FC<DevModeProps> = ({ isOpen, onClose, onSuccess, onUploadG
 
               <div>
                 <label className="block text-sm font-semibold text-gray-300 mb-2">
-                  Game File (HTML/ZIP)
+                  Game File (HTML, React, or ZIP)
                 </label>
                 <input
                   type="file"
                   onChange={handleFileSelect}
-                  accept=".html,.zip"
+                  accept=".html,.jsx,.js,.tsx,.ts,.zip"
                   className="w-full text-sm text-gray-400 file:mr-3 file:bg-blue-600 file:hover:bg-blue-700 file:text-white file:px-3 file:py-1 file:rounded file:cursor-pointer file:font-semibold"
                 />
                 {selectedFile && (
