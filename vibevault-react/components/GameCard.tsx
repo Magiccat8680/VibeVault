@@ -55,25 +55,24 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
         {/* Background Visuals */}
         <div className="absolute inset-0 pointer-events-none select-none">
              <div className="absolute inset-0" style={theme} />
-             <div className="w-full h-full bg-black flex items-center justify-center overflow-hidden">
+             <div className="w-full h-full bg-black flex items-center justify-center overflow-hidden" style={{ aspectRatio: '16 / 9' }}>
                 <div style={{ 
-                  width: '1024px', 
-                  height: '300x',
-                  transformOrigin: 'top center',
-                  transform: 'scale(0.6)',
+                  width: '100%',
+                  height: '100%',
                   position: 'relative'
                 }}>
                   <iframe 
                       srcDoc={game.content}
                       className="border-none pointer-events-none absolute inset-0" 
                       tabIndex={-1}
+                      title="preview"" 
+                      tabIndex={-1}
                       title="preview"
                       style={{ 
                         pointerEvents: 'none',
                         width: '100%',
-                        height: '100%'
-                      }}
-                  />
+                        height: '100%',
+                        objectFit: 'contain
                 </div>
             </div>
         </div>
