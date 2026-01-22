@@ -57,10 +57,10 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
              <div className="absolute inset-0" style={theme} />
              <div className="w-full h-full bg-black flex items-center justify-center overflow-hidden">
                 <div style={{ 
-                  width: '600px', 
+                  width: '800px', 
                   height: '240px',
                   transformOrigin: 'top center',
-                  transform: 'scale(1)',
+                  transform: 'scale(1.5)',
                   position: 'relative'
                 }}>
                   <iframe 
