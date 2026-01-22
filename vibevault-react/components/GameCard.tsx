@@ -60,7 +60,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
                   width: '800px', 
                   height: '600px',
                   transformOrigin: 'top center',
-                  transform: 'scale(0.5)',
+                  transform: 'scale(0.75)',
                   position: 'relative'
                 }}>
                   <iframe 
