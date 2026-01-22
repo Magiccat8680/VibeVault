@@ -308,8 +308,76 @@ const App: React.FC = () => {
       />
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:p-8 overflow-y-auto">
+      <main className="flex-1 p-6 md:p-8 overflow-y-auto relative">
+        {/* Animated Wallpaper Background */}
+        <style>{`
+          @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+          }
+          @keyframes float-1 {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(-20px) translateX(10px); }
+          }
+          @keyframes float-2 {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(20px) translateX(-15px); }
+          }
+          @keyframes pulse-glow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+          }
+          .wallpaper-animated {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: linear-gradient(-45deg, #1b2838, #2d3e50, #0f1419, #1b2838);
+            background-size: 400% 400%;
+            animation: gradient-shift 15s ease infinite;
+          }
+          .wallpaper-orb {
+            position: absolute;
+            border-radius: 50%;
+            mix-blend-mode: screen;
+            filter: blur(80px);
+            animation: pulse-glow 4s ease-in-out infinite;
+          }
+          .orb-1 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(102, 192, 244, 0.3), transparent);
+            top: 10%;
+            left: 10%;
+            animation: float-1 8s ease-in-out infinite, pulse-glow 4s ease-in-out infinite;
+          }
+          .orb-2 {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(156, 39, 176, 0.2), transparent);
+            bottom: 10%;
+            right: 15%;
+            animation: float-2 10s ease-in-out infinite, pulse-glow 5s ease-in-out infinite;
+          }
+          .orb-3 {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(25, 118, 210, 0.25), transparent);
+            top: 40%;
+            right: 10%;
+            animation: float-1 12s ease-in-out infinite, pulse-glow 6s ease-in-out infinite;
+          }
+        `}</style>
+        <div className="wallpaper-animated">
+          <div className="orb-1"></div>
+          <div className="orb-2"></div>
+          <div className="orb-3"></div>
+        </div>
         
+        <div className="relative z-10">
         <div className="flex items-center justify-between mb-8 text-sm text-gray-500">
           <div className="flex items-center gap-4">
              <span className="flex items-center gap-2 px-3 py-1 bg-green-900/20 border border-green-600/50 rounded text-green-500 font-bold uppercase tracking-wider text-xs">
@@ -424,7 +492,7 @@ const App: React.FC = () => {
 
             {/* Games Display */}
             {games.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-16">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-16 auto-rows-max">
                 {games
                   .filter(g => selectedFolder === null ? !g.folderId : g.folderId === selectedFolder)
                   .sort((a, b) => b.addedAt - a.addedAt)
@@ -465,6 +533,7 @@ const App: React.FC = () => {
         onExportJson={() => downloadJson(`VibeVault_Backup_${Date.now()}.json`, { v: "react-1.0", games })}
         onExportZip={() => exportToZip(games)}
       />
+        </div>
     </div>
   );
 };
