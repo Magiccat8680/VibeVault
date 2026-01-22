@@ -34,7 +34,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
     <div 
       draggable
       onDragStart={onDragStart}
-      className="group relative flex flex-col rounded-sm overflow-hidden bg-[#1b2838] border border-white/5 hover:border-[#66c0f4] hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.5)] transition-all duration-300 w-80 h-96 flex-shrink-0 cursor-grab active:cursor-grabbing"
+      className="group relative flex flex-col rounded-xl overflow-hidden bg-[#1b2838] border border-white/10 hover:border-[#66c0f4] hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(102,192,244,0.2)] transition-all duration-300 w-full h-96 flex-shrink-0 cursor-grab active:cursor-grabbing"
     >
       
       {/* --- DELETE BUTTON (Absolute Overlay - Highest Z-Index) --- */}
@@ -60,7 +60,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
                   width: '320px', 
                   height: '240px',
                   transformOrigin: 'top center',
-                  transform: 'scale(0.85)',
+                  transform: 'scale(0.7)',
                   position: 'relative'
                 }}>
                   <iframe 
@@ -88,7 +88,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
 
       {/* --- INFO SECTION (Clickable) --- */}
       <div 
-        className="flex-1 bg-[#171a21] border-t border-white/5 flex flex-col justify-center px-4 py-2 cursor-pointer relative z-10"
+        className="flex-1 bg-gradient-to-b from-[#171a21] to-[#0f1419] border-t border-white/10 flex flex-col justify-center px-4 py-3 cursor-pointer relative z-10"
         onClick={() => onLaunch(game)}
       >
         <h3 className="font-bold text-gray-200 truncate text-lg group-hover:text-[#66c0f4] transition-colors">
