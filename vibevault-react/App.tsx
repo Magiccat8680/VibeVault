@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { Game, GameFolder } from './types';
 import Header from './components/Header';
 import GameCard from './components/GameCard';
@@ -279,6 +280,7 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#1b2838] text-gray-300 font-sans">
+      <Analytics />
       
       {/* Hidden Inputs */}
       <input 
