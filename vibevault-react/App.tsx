@@ -517,6 +517,7 @@ const App: React.FC = () => {
             )}
           </>
         )}
+        </div>
       </main>
 
       {playingGame && (
@@ -533,7 +534,6 @@ const App: React.FC = () => {
         onExportJson={() => downloadJson(`VibeVault_Backup_${Date.now()}.json`, { v: "react-1.0", games })}
         onExportZip={() => exportToZip(games)}
       />
-        </div>
     </div>
   );
 };
