@@ -422,7 +422,7 @@ const App: React.FC = () => {
 
             {/* Games Display */}
             {games.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-16">
                 {games
                   .filter(g => selectedFolder === null ? !g.folderId : g.folderId === selectedFolder)
                   .sort((a, b) => b.addedAt - a.addedAt)
