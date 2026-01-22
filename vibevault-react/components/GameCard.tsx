@@ -34,7 +34,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
     <div 
       draggable
       onDragStart={onDragStart}
-      className="group relative flex flex-col rounded-xl overflow-hidden bg-[#1b2838] border border-white/10 hover:border-[#66c0f4] hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(102,192,244,0.2)] transition-all duration-300 w-full h-full flex-shrink-0 cursor-grab active:cursor-grabbing"
+      className="group relative flex flex-col rounded-xl overflow-hidden bg-[#1b2838] border border-white/10 hover:border-[#66c0f4] hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(102,192,244,0.2)] transition-all duration-300 w-full min-h-96 flex-shrink-0 cursor-grab active:cursor-grabbing"
     >
       
       {/* --- DELETE BUTTON (Absolute Overlay - Highest Z-Index) --- */}
