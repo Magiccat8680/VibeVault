@@ -34,7 +34,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
     <div 
       draggable
       onDragStart={onDragStart}
-      className="group relative flex flex-col rounded-sm overflow-hidden bg-[#1b2838] border border-white/5 hover:border-[#66c0f4] hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.5)] transition-all duration-300 h-40 cursor-grab active:cursor-grabbing"
+      className="group relative flex flex-col rounded-sm overflow-hidden bg-[#1b2838] border border-white/5 hover:border-[#66c0f4] hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.5)] transition-all duration-300 h-64 cursor-grab active:cursor-grabbing"
     >
       
       {/* --- DELETE BUTTON (Absolute Overlay - Highest Z-Index) --- */}
@@ -55,18 +55,14 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
         {/* Background Visuals */}
         <div className="absolute inset-0 pointer-events-none select-none">
              <div className="absolute inset-0" style={theme} />
-             <div className="w-full h-full bg-white opacity-90 flex items-center justify-center overflow-hidden">
+             <div className="w-full h-full bg-white opacity-95 flex items-center justify-center overflow-hidden">
                 <iframe 
                     srcDoc={game.content}
-                    className="border-none pointer-events-none" 
+                    className="border-none pointer-events-none w-full h-full" 
                     tabIndex={-1}
                     title="preview"
                     style={{ 
-                      pointerEvents: 'none', 
-                      transformOrigin: 'top left',
-                      transform: 'scale(0.25)',
-                      width: '320px',
-                      height: '240px'
+                      pointerEvents: 'none'
                     }}
                 />
             </div>
