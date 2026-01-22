@@ -58,7 +58,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
              <div className="w-full h-full bg-black flex items-center justify-center overflow-hidden">
                 <div style={{ 
                   width: '1024px', 
-                  height: '576px',
+                  height: '700x',
                   transformOrigin: 'top center',
                   transform: 'scale(0.6)',
                   position: 'relative'
