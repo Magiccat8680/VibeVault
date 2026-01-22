@@ -22,7 +22,10 @@ import {
   deleteFolderFromDB,
   loadArcadeGamesFromDB,
   saveArcadeGameToDB,
-  deleteArcadeGameFromDB
+  deleteArcadeGameFromDB,
+  saveArcadeGameToSupabase,
+  loadArcadeGamesFromSupabase,
+  deleteArcadeGameFromSupabase
 } from './services/gameService';
 import { HardDrive, Loader2, Ghost, Plus, Folder, Trash2, Gamepad2 } from 'lucide-react';
 
@@ -50,10 +53,12 @@ const App: React.FC = () => {
       try {
         const storedGames = await loadGamesFromDB();
         const storedFolders = await loadFoldersFromDB();
-        const storedArcadeGames = await loadArcadeGamesFromDB();
         setGames(storedGames);
         setFolders(storedFolders);
-        setArcadeGames(storedArcadeGames);
+        
+        // Load arcade games from Supabase
+        const arcadeGames = await loadArcadeGamesFromSupabase();
+        setArcadeGames(arcadeGames);
       } catch (e) {
         console.error("Failed to load games from DB", e);
       } finally {
@@ -311,7 +316,8 @@ const App: React.FC = () => {
         likes: 0
       };
 
-      await saveArcadeGameToDB(newArcadeGame);
+      // Save to Supabase instead of local IndexedDB
+      await saveArcadeGameToSupabase(newArcadeGame);
       setArcadeGames(prev => [newArcadeGame, ...prev]);
     } catch (err) {
       console.error('Failed to upload arcade game', err);
@@ -321,7 +327,7 @@ const App: React.FC = () => {
 
   const handleDeleteArcadeGame = async (gameId: string) => {
     try {
-      await deleteArcadeGameFromDB(gameId);
+      await deleteArcadeGameFromSupabase(gameId);
       setArcadeGames(prev => prev.filter(g => g.id !== gameId));
     } catch (err) {
       console.error('Failed to delete arcade game', err);

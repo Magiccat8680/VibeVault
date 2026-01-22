@@ -1,4 +1,5 @@
 import { Game, GameFolder, ArcadeGame } from '../types';
+import { supabase } from './supabaseService';
 
 // --- IndexedDB Configuration ---
 const DB_NAME = 'VibeVaultDB';
@@ -374,4 +375,70 @@ export const deleteArcadeGameFromDB = async (id: string): Promise<void> => {
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
   });
+};
+
+// --- Supabase Arcade Functions ---
+
+/**
+ * Save an arcade game to Supabase
+ */
+export const saveArcadeGameToSupabase = async (game: ArcadeGame): Promise<void> => {
+  const { error } = await supabase
+    .from('arcade_games')
+    .insert([
+      {
+        id: game.id,
+        name: game.name,
+        content: game.content,
+        uploader_name: game.uploaderName,
+        added_at: game.addedAt,
+        uploaded_at: game.uploadedAt,
+        likes: game.likes || 0
+      }
+    ]);
+
+  if (error) {
+    console.error('Error saving arcade game to Supabase:', error);
+    throw error;
+  }
+};
+
+/**
+ * Load all arcade games from Supabase
+ */
+export const loadArcadeGamesFromSupabase = async (): Promise<ArcadeGame[]> => {
+  const { data, error } = await supabase
+    .from('arcade_games')
+    .select('*')
+    .order('uploaded_at', { ascending: false });
+
+  if (error) {
+    console.error('Error loading arcade games from Supabase:', error);
+    return [];
+  }
+
+  return (data || []).map(row => ({
+    id: row.id,
+    name: row.name,
+    content: row.content,
+    addedAt: row.added_at,
+    uploaderName: row.uploader_name,
+    uploadedAt: row.uploaded_at,
+    likes: row.likes || 0
+  }));
+};
+
+/**
+ * Delete an arcade game from Supabase
+ */
+export const deleteArcadeGameFromSupabase = async (id: string): Promise<void> => {
+  const { error } = await supabase
+    .from('arcade_games')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting arcade game from Supabase:', error);
+    throw error;
+  }
 };
