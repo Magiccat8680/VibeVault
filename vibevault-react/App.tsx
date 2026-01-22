@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Analytics } from "@vercel/analytics/react";
-import { Game, GameFolder } from './types';
+import { Game, GameFolder, ArcadeGame } from './types';
 import Header from './components/Header';
 import GameCard from './components/GameCard';
 import ExportModal from './components/ExportModal';
 import PlayOverlay from './components/PlayOverlay';
+import DevMode from './components/DevMode';
+import ArcadeGames from './components/ArcadeGames';
 import { 
   extractTitleFromHtml, 
   downloadJson, 
@@ -17,13 +19,19 @@ import {
   clearDB,
   loadFoldersFromDB,
   saveFolderToDB,
-  deleteFolderFromDB
+  deleteFolderFromDB,
+  loadArcadeGamesFromDB,
+  saveArcadeGameToDB,
+  deleteArcadeGameFromDB
 } from './services/gameService';
-import { HardDrive, Loader2, Ghost, Plus, Folder, Trash2 } from 'lucide-react';
+import { HardDrive, Loader2, Ghost, Plus, Folder, Trash2, Gamepad2 } from 'lucide-react';
 
 const App: React.FC = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [folders, setFolders] = useState<GameFolder[]>([]);
+  const [arcadeGames, setArcadeGames] = useState<ArcadeGame[]>([]);
+  const [showArcade, setShowArcade] = useState(false);
+  const [showDevMode, setShowDevMode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
@@ -42,8 +50,10 @@ const App: React.FC = () => {
       try {
         const storedGames = await loadGamesFromDB();
         const storedFolders = await loadFoldersFromDB();
+        const storedArcadeGames = await loadArcadeGamesFromDB();
         setGames(storedGames);
         setFolders(storedFolders);
+        setArcadeGames(storedArcadeGames);
       } catch (e) {
         console.error("Failed to load games from DB", e);
       } finally {
@@ -278,6 +288,46 @@ const App: React.FC = () => {
     }
   };
 
+  const handleArcadeUpload = async (uploaderName: string, gameFile: File) => {
+    try {
+      const text = await gameFile.text();
+      let content = text;
+      let title = gameFile.name;
+
+      if (gameFile.name.match(/\.(jsx?|tsx|js)$/i)) {
+        content = wrapReactCode(text, gameFile.name);
+        title = gameFile.name.replace(/\.(jsx?|tsx|js)$/i, '');
+      } else {
+        title = extractTitleFromHtml(text, gameFile.name);
+      }
+
+      const newArcadeGame: ArcadeGame = {
+        id: generateId(),
+        name: title,
+        content: content,
+        addedAt: Date.now(),
+        uploaderName: uploaderName,
+        uploadedAt: Date.now(),
+        likes: 0
+      };
+
+      await saveArcadeGameToDB(newArcadeGame);
+      setArcadeGames(prev => [newArcadeGame, ...prev]);
+    } catch (err) {
+      console.error('Failed to upload arcade game', err);
+      throw err;
+    }
+  };
+
+  const handleDeleteArcadeGame = async (gameId: string) => {
+    try {
+      await deleteArcadeGameFromDB(gameId);
+      setArcadeGames(prev => prev.filter(g => g.id !== gameId));
+    } catch (err) {
+      console.error('Failed to delete arcade game', err);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#1b2838] text-gray-300 font-sans">
       <Analytics />
@@ -301,10 +351,14 @@ const App: React.FC = () => {
 
       <Header 
         gameCount={games.length}
+        arcadeGameCount={arcadeGames.length}
         onAddClick={() => fileInputRef.current?.click()}
         onImportClick={() => importInputRef.current?.click()}
         onExportClick={() => setShowExportModal(true)}
         onDebugClick={handleDebug}
+        onArcadeClick={() => setShowArcade(!showArcade)}
+        onDevModeClick={() => setShowDevMode(true)}
+        showArcade={showArcade}
       />
 
       {/* Main Content */}
@@ -395,6 +449,29 @@ const App: React.FC = () => {
            <div className="flex justify-center mt-20">
               <Loader2 className="animate-spin text-[#66c0f4]" size={40} />
            </div>
+        ) : showArcade ? (
+          <>
+            {/* Arcade Mode */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                  <Gamepad2 size={28} className="text-yellow-500" />
+                  Online Arcade
+                </h2>
+                <button
+                  onClick={() => setShowDevMode(true)}
+                  className="flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-sm text-sm font-bold transition-colors"
+                >
+                  Upload Game
+                </button>
+              </div>
+              <ArcadeGames 
+                games={arcadeGames}
+                onPlay={(game) => setPlayingGame(game as Game)}
+                onDelete={handleDeleteArcadeGame}
+              />
+            </div>
+          </>
         ) : (
           <>
             {/* Folder Management */}
@@ -533,6 +610,13 @@ const App: React.FC = () => {
         onClose={() => setShowExportModal(false)}
         onExportJson={() => downloadJson(`VibeVault_Backup_${Date.now()}.json`, { v: "react-1.0", games })}
         onExportZip={() => exportToZip(games)}
+      />
+
+      <DevMode
+        isOpen={showDevMode}
+        onClose={() => setShowDevMode(false)}
+        onSuccess={() => setShowDevMode(false)}
+        onUploadGame={handleArcadeUpload}
       />
     </div>
   );

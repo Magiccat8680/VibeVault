@@ -1,10 +1,11 @@
-import { Game, GameFolder } from '../types';
+import { Game, GameFolder, ArcadeGame } from '../types';
 
 // --- IndexedDB Configuration ---
 const DB_NAME = 'VibeVaultDB';
 const STORE_NAME = 'games';
 const FOLDERS_STORE_NAME = 'folders';
-const DB_VERSION = 2;
+const ARCADE_STORE_NAME = 'arcadeGames';
+const DB_VERSION = 3;
 
 /**
  * Initialize the database
@@ -21,6 +22,9 @@ export const initDB = (): Promise<IDBDatabase> => {
       }
       if (!db.objectStoreNames.contains(FOLDERS_STORE_NAME)) {
         db.createObjectStore(FOLDERS_STORE_NAME, { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains(ARCADE_STORE_NAME)) {
+        db.createObjectStore(ARCADE_STORE_NAME, { keyPath: 'id' });
       }
     };
   });
@@ -322,6 +326,50 @@ export const deleteFolderFromDB = async (id: string): Promise<void> => {
   return new Promise((resolve, reject) => {
     const tx = db.transaction(FOLDERS_STORE_NAME, 'readwrite');
     const store = tx.objectStore(FOLDERS_STORE_NAME);
+    const request = store.delete(id);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+};
+
+// --- Arcade Game Storage ---
+
+/**
+ * Save an arcade game to the database
+ */
+export const saveArcadeGameToDB = async (game: ArcadeGame): Promise<void> => {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(ARCADE_STORE_NAME, 'readwrite');
+    const store = tx.objectStore(ARCADE_STORE_NAME);
+    const request = store.put(game);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+};
+
+/**
+ * Load all arcade games from the database
+ */
+export const loadArcadeGamesFromDB = async (): Promise<ArcadeGame[]> => {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(ARCADE_STORE_NAME, 'readonly');
+    const store = tx.objectStore(ARCADE_STORE_NAME);
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+  });
+};
+
+/**
+ * Delete an arcade game from the database
+ */
+export const deleteArcadeGameFromDB = async (id: string): Promise<void> => {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(ARCADE_STORE_NAME, 'readwrite');
+    const store = tx.objectStore(ARCADE_STORE_NAME);
     const request = store.delete(id);
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);

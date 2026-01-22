@@ -1,20 +1,28 @@
 import React from 'react';
-import { Gamepad2, Plus, Download, Upload, Bug } from 'lucide-react';
+import { Gamepad2, Plus, Download, Upload, Bug, Zap } from 'lucide-react';
 
 interface HeaderProps {
   gameCount: number;
+  arcadeGameCount?: number;
   onAddClick: () => void;
   onImportClick: () => void;
   onExportClick: () => void;
   onDebugClick: () => void;
+  onArcadeClick?: () => void;
+  onDevModeClick?: () => void;
+  showArcade?: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({ 
   gameCount, 
+  arcadeGameCount = 0,
   onAddClick, 
   onImportClick, 
   onExportClick,
-  onDebugClick
+  onDebugClick,
+  onArcadeClick,
+  onDevModeClick,
+  showArcade = false
 }) => {
   return (
     <header className="bg-[#171a21] border-b border-gray-800 shadow-xl sticky top-0 z-40">
@@ -45,6 +53,19 @@ const Header: React.FC<HeaderProps> = ({
           <div className="h-8 w-px bg-gray-700 mx-1 hidden md:block"></div>
 
           <button 
+            onClick={onArcadeClick}
+            className={`flex items-center gap-2 px-4 py-2 rounded-sm text-sm font-bold transition-all whitespace-nowrap ${
+              showArcade
+                ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg'
+                : 'bg-[#2a475e] hover:bg-[#3d5a77] text-white'
+            }`}
+          >
+            <Gamepad2 size={16} /> ARCADE {arcadeGameCount > 0 ? `(${arcadeGameCount})` : ''}
+          </button>
+
+          <div className="h-8 w-px bg-gray-700 mx-1 hidden md:block"></div>
+
+          <button 
             onClick={onExportClick}
             className="flex items-center gap-2 bg-[#2a475e] hover:bg-[#3d5a77] text-white px-4 py-2 rounded-sm text-sm font-medium transition-colors whitespace-nowrap"
           >
@@ -56,6 +77,14 @@ const Header: React.FC<HeaderProps> = ({
             className="flex items-center gap-2 bg-[#2a475e] hover:bg-[#3d5a77] text-white px-4 py-2 rounded-sm text-sm font-medium transition-colors whitespace-nowrap"
           >
             <Upload size={16} /> IMPORT
+          </button>
+
+          <button 
+            onClick={onDevModeClick}
+            className="p-2 text-gray-500 hover:text-yellow-400 transition-colors"
+            title="Developer Mode"
+          >
+            <Zap size={18} />
           </button>
 
           <button 

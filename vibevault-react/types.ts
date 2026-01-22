@@ -13,6 +13,12 @@ export interface GameFolder {
   createdAt: number;
 }
 
+export interface ArcadeGame extends Game {
+  uploaderName: string;
+  uploadedAt: number;
+  likes?: number;
+}
+
 export interface StorageStats {
   count: number;
   totalSize: string;
