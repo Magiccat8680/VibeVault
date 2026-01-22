@@ -63,16 +63,16 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
                 }}>
                   <iframe 
                       srcDoc={game.content}
-                      className="border-none pointer-events-none absolute inset-0" 
-                      tabIndex={-1}
-                      title="preview"" 
+                      className="border-none pointer-events-none" 
                       tabIndex={-1}
                       title="preview"
                       style={{ 
                         pointerEvents: 'none',
                         width: '100%',
                         height: '100%',
-                        objectFit: 'contain
+                        objectFit: 'contain'
+                      }}
+                  />
                 </div>
             </div>
         </div>
