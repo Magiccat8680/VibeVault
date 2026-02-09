@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Play, Trash2, Calendar } from 'lucide-react';
+import { Play, Trash2, Calendar, HardDrive } from 'lucide-react';
 import { Game } from '../types';
 import { formatGameName } from '../utils';
 
@@ -41,10 +41,10 @@ const GameCard: React.FC<GameCardProps> = ({ game, onLaunch, onDelete, onDragSta
       <button 
         type="button"
         onClick={handleDelete}
-        className="absolute top-2 right-2 z-50 bg-black/80 hover:bg-red-600 text-white/70 hover:text-white p-2 rounded-full transition-all duration-200 shadow-lg border border-white/10 hover:border-white/40 hover:scale-110"
-        title="Delete Game"
+        className="absolute top-2 right-2 z-50 bg-black/80 hover:bg-red-600 text-white/70 hover:text-white p-2 rounded-full transition-all duration-200 shadow-lg border border-white/10 hover:border-white/40 hover:scale-110 group/delete"
+        title="Remove from Vault & Local Storage"
       >
-        <Trash2 size={16} />
+        <Trash2 size={16} className="group-hover/delete:animate-bounce" />
       </button>
 
       {/* --- THUMBNAIL SECTION (Clickable) --- */}

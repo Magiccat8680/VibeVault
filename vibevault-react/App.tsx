@@ -7,6 +7,7 @@ import ExportModal from './components/ExportModal';
 import PlayOverlay from './components/PlayOverlay';
 import DevMode from './components/DevMode';
 import ArcadeGames from './components/ArcadeGames';
+import IntroPage from './components/IntroPage';
 import { 
   extractTitleFromHtml, 
   downloadJson, 
@@ -42,10 +43,16 @@ const App: React.FC = () => {
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [newFolderName, setNewFolderName] = useState('');
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
+  const [showIntro, setShowIntro] = useState(localStorage.getItem('vibevault_hide_intro') !== 'true');
   
   // Hidden inputs
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importInputRef = useRef<HTMLInputElement>(null);
+
+  const handleGetStarted = () => {
+    setShowIntro(false);
+    localStorage.setItem('vibevault_hide_intro', 'true');
+  };
 
   // Initial Load from DB
   useEffect(() => {
@@ -335,8 +342,12 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#1b2838] text-gray-300 font-sans">
+    <>
       <Analytics />
+      {showIntro ? (
+        <IntroPage onGetStarted={handleGetStarted} gameCount={games.length} />
+      ) : (
+        <div className="flex flex-col min-h-screen bg-[#1b2838] text-gray-300 font-sans">
       
       {/* Hidden Inputs */}
       <input 
@@ -624,7 +635,9 @@ const App: React.FC = () => {
         onSuccess={() => setShowDevMode(false)}
         onUploadGame={handleArcadeUpload}
       />
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 
