@@ -36,6 +36,7 @@ const App: React.FC = () => {
   const [arcadeGames, setArcadeGames] = useState<ArcadeGame[]>([]);
   const [showArcade, setShowArcade] = useState(false);
   const [showDevMode, setShowDevMode] = useState(false);
+  const [devAuthenticated, setDevAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
@@ -73,7 +74,7 @@ const App: React.FC = () => {
       }
     };
     init();
-  }, []);
+  }, [devAuthenticated]);
 
   // --- Handlers ---
 
@@ -267,9 +268,16 @@ const App: React.FC = () => {
   };
 
   const deleteGame = useCallback(async (id: string) => {
+    if (!devAuthenticated) {
+      if (window.confirm('Deleting games requires Developer Mode. Open Dev Mode now?')) {
+        setShowDevMode(true);
+      }
+      return;
+    }
+
     // Bypass window.confirm to ensure it works in all environments
     console.log("Deleting game:", id);
-    
+
     // 1. Optimistic UI update
     setGames(prev => prev.filter(g => g.id !== id));
 
@@ -333,6 +341,13 @@ const App: React.FC = () => {
   };
 
   const handleDeleteArcadeGame = async (gameId: string) => {
+    if (!devAuthenticated) {
+      if (window.confirm('Deleting arcade games requires Developer Mode. Open Dev Mode now?')) {
+        setShowDevMode(true);
+      }
+      return;
+    }
+
     try {
       await deleteArcadeGameFromSupabase(gameId);
       setArcadeGames(prev => prev.filter(g => g.id !== gameId));
@@ -634,6 +649,7 @@ const App: React.FC = () => {
         onClose={() => setShowDevMode(false)}
         onSuccess={() => setShowDevMode(false)}
         onUploadGame={handleArcadeUpload}
+        onAuthenticated={(v) => setDevAuthenticated(v)}
       />
         </div>
       )}

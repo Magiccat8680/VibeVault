@@ -6,6 +6,7 @@ interface DevModeProps {
   onClose: () => void;
   onSuccess: () => void;
   onUploadGame: (uploaderName: string, gameFile: File) => void;
+  onAuthenticated?: (value: boolean) => void;
 }
 
 const DevMode: React.FC<DevModeProps> = ({ isOpen, onClose, onSuccess, onUploadGame }) => {
@@ -21,6 +22,7 @@ const DevMode: React.FC<DevModeProps> = ({ isOpen, onClose, onSuccess, onUploadG
     const devCode = import.meta.env.VITE_DEV_CODE || '';
     if (code === devCode) {
       setIsAuthenticated(true);
+      if (onAuthenticated) onAuthenticated(true);
       setMessage('');
     } else {
       setMessage('Invalid dev code');
@@ -155,6 +157,7 @@ const DevMode: React.FC<DevModeProps> = ({ isOpen, onClose, onSuccess, onUploadG
                   type="button"
                   onClick={() => {
                     setIsAuthenticated(false);
+                    if (onAuthenticated) onAuthenticated(false);
                     setMessage('');
                   }}
                   className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors"
