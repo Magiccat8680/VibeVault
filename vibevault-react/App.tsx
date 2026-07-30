@@ -51,6 +51,7 @@ const App: React.FC = () => {
   const [newFolderName, setNewFolderName] = useState('');
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
   const [showIntro, setShowIntro] = useState(localStorage.getItem('vibevault_hide_intro') !== 'true');
+  const [pendingAction, setPendingAction] = useState<{ type: 'deleteGame' | 'deleteArcadeGame', id: string } | null>(null);
   
   // Hidden inputs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -273,9 +274,10 @@ const App: React.FC = () => {
     }
   };
 
-  const deleteGame = useCallback(async (id: string) => {
-    if (!devAuthenticated) {
+  const deleteGame = useCallback(async (id: string, bypassAuth = false) => {
+    if (!devAuthenticated && !bypassAuth) {
       if (window.confirm('Deleting games requires Developer Mode. Open Dev Mode now?')) {
+        setPendingAction({ type: 'deleteGame', id });
         setShowDevMode(true);
       }
       return;
@@ -295,7 +297,7 @@ const App: React.FC = () => {
         console.error("Failed to delete game from DB", e);
         // Optional: rollback state if needed, but for local apps, failure is rare unless storage is broken
     }
-  }, []);
+  }, [devAuthenticated]);
 
   const handleDebug = async () => {
     const msg = `
@@ -346,9 +348,10 @@ const App: React.FC = () => {
     }
   };
 
-  const handleDeleteArcadeGame = async (gameId: string) => {
-    if (!devAuthenticated) {
+  const handleDeleteArcadeGame = async (gameId: string, bypassAuth = false) => {
+    if (!devAuthenticated && !bypassAuth) {
       if (window.confirm('Deleting arcade games requires Developer Mode. Open Dev Mode now?')) {
+        setPendingAction({ type: 'deleteArcadeGame', id: gameId });
         setShowDevMode(true);
       }
       return;
@@ -652,13 +655,25 @@ const App: React.FC = () => {
 
       <DevMode
         isOpen={showDevMode}
-        onClose={() => setShowDevMode(false)}
+        onClose={() => {
+          setShowDevMode(false);
+          setPendingAction(null);
+        }}
         onSuccess={() => setShowDevMode(false)}
         onUploadGame={handleArcadeUpload}
         onAuthenticated={(v) => {
           setDevAuthenticated(v);
           if (v) {
             localStorage.setItem('vibevault_dev_auth_expiry', (Date.now() + 24 * 60 * 60 * 1000).toString());
+            if (pendingAction) {
+              if (pendingAction.type === 'deleteGame') {
+                deleteGame(pendingAction.id, true);
+              } else if (pendingAction.type === 'deleteArcadeGame') {
+                handleDeleteArcadeGame(pendingAction.id, true);
+              }
+              setPendingAction(null);
+              setShowDevMode(false);
+            }
           } else {
             localStorage.removeItem('vibevault_dev_auth_expiry');
           }
