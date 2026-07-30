@@ -36,7 +36,13 @@ const App: React.FC = () => {
   const [arcadeGames, setArcadeGames] = useState<ArcadeGame[]>([]);
   const [showArcade, setShowArcade] = useState(false);
   const [showDevMode, setShowDevMode] = useState(false);
-  const [devAuthenticated, setDevAuthenticated] = useState(false);
+  const [devAuthenticated, setDevAuthenticated] = useState(() => {
+    const expiry = localStorage.getItem('vibevault_dev_auth_expiry');
+    if (expiry && parseInt(expiry, 10) > Date.now()) {
+      return true;
+    }
+    return false;
+  });
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
@@ -649,7 +655,14 @@ const App: React.FC = () => {
         onClose={() => setShowDevMode(false)}
         onSuccess={() => setShowDevMode(false)}
         onUploadGame={handleArcadeUpload}
-        onAuthenticated={(v) => setDevAuthenticated(v)}
+        onAuthenticated={(v) => {
+          setDevAuthenticated(v);
+          if (v) {
+            localStorage.setItem('vibevault_dev_auth_expiry', (Date.now() + 24 * 60 * 60 * 1000).toString());
+          } else {
+            localStorage.removeItem('vibevault_dev_auth_expiry');
+          }
+        }}
       />
         </div>
       )}

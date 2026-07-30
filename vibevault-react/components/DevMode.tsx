@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Lock, Upload } from 'lucide-react';
 
 interface DevModeProps {
@@ -11,11 +11,21 @@ interface DevModeProps {
 
 const DevMode: React.FC<DevModeProps> = ({ isOpen, onClose, onSuccess, onUploadGame }) => {
   const [code, setCode] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const expiry = localStorage.getItem('vibevault_dev_auth_expiry');
+    return expiry && parseInt(expiry, 10) > Date.now();
+  });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploaderName, setUploaderName] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      const expiry = localStorage.getItem('vibevault_dev_auth_expiry');
+      setIsAuthenticated(!!(expiry && parseInt(expiry, 10) > Date.now()));
+    }
+  }, [isOpen]);
 
   const handleSubmitCode = (e: React.FormEvent) => {
     e.preventDefault();
