@@ -36,6 +36,7 @@ const App: React.FC = () => {
   const [arcadeGames, setArcadeGames] = useState<ArcadeGame[]>([]);
   const [showArcade, setShowArcade] = useState(false);
   const [showDevMode, setShowDevMode] = useState(false);
+  const [pendingAction, setPendingAction] = useState<{ type: 'deleteLocal' | 'deleteArcade', id: string } | null>(null);
   const [devAuthenticated, setDevAuthenticated] = useState(() => {
     const expiry = localStorage.getItem('vibevault_dev_auth_expiry');
     if (expiry && parseInt(expiry, 10) > Date.now()) {
@@ -276,6 +277,7 @@ const App: React.FC = () => {
   const deleteGame = useCallback(async (id: string) => {
     if (!devAuthenticated) {
       if (window.confirm('Deleting games requires Developer Mode. Open Dev Mode now?')) {
+        setPendingAction({ type: 'deleteLocal', id });
         setShowDevMode(true);
       }
       return;
@@ -349,6 +351,7 @@ const App: React.FC = () => {
   const handleDeleteArcadeGame = async (gameId: string) => {
     if (!devAuthenticated) {
       if (window.confirm('Deleting arcade games requires Developer Mode. Open Dev Mode now?')) {
+        setPendingAction({ type: 'deleteArcade', id: gameId });
         setShowDevMode(true);
       }
       return;
@@ -652,13 +655,36 @@ const App: React.FC = () => {
 
       <DevMode
         isOpen={showDevMode}
-        onClose={() => setShowDevMode(false)}
+        onClose={() => {
+          setShowDevMode(false);
+          setPendingAction(null);
+        }}
         onSuccess={() => setShowDevMode(false)}
         onUploadGame={handleArcadeUpload}
         onAuthenticated={(v) => {
           setDevAuthenticated(v);
           if (v) {
             localStorage.setItem('vibevault_dev_auth_expiry', (Date.now() + 24 * 60 * 60 * 1000).toString());
+
+            // Execute pending action if any
+            if (pendingAction) {
+              if (pendingAction.type === 'deleteLocal') {
+                // Inline the delete logic to avoid hook dependency issues, or we can just call it since devAuthenticated is now true in state (or will be soon, but closure might have old state. Since we bypass the check in the inline logic it's safer)
+                // Actually it's better to just directly execute the DB logic here
+                const id = pendingAction.id;
+                console.log("Deleting local game from pending action:", id);
+                setGames(prev => prev.filter(g => g.id !== id));
+                deleteGameFromDB(id).catch(e => console.error("Failed to delete game from DB", e));
+              } else if (pendingAction.type === 'deleteArcade') {
+                const gameId = pendingAction.id;
+                console.log("Deleting arcade game from pending action:", gameId);
+                deleteArcadeGameFromSupabase(gameId).then(() => {
+                  setArcadeGames(prev => prev.filter(g => g.id !== gameId));
+                }).catch(e => console.error('Failed to delete arcade game', e));
+              }
+              setPendingAction(null);
+              setShowDevMode(false);
+            }
           } else {
             localStorage.removeItem('vibevault_dev_auth_expiry');
           }
